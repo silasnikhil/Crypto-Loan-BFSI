@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
+import { useNavigate } from "react-router";
 import "./NavBar.css";
 
 const NavBar = () => {
   const [toggleMenu, setToggleMenu] = useState(false);
+  const navigate = useNavigate();
   return (
     <div className="flex justify-between items-center pt-8 pb-8 pl-24 pr-24">
       <div className="flex-1 flex justify-start items-center">
@@ -23,8 +25,10 @@ const NavBar = () => {
         </div>
       </div>
       <div className="navbar-sign">
-        <p>Sign in</p>
-        <button type="button">Sign up</button>
+        <p>Sign up</p>
+        <button type="button" onClick={() => navigate("/dashboard")}>
+          Sign in
+        </button>
       </div>
       <div className="navbar-menu">
         {toggleMenu ? (

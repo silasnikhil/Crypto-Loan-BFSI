@@ -8,6 +8,10 @@ class cryptoService {
     console.log(data);
     return data;
   }
+
+  getLoan(wallet) {
+    return axios.put(BASE_URL, wallet);
+  }
 }
 
 export default new cryptoService();

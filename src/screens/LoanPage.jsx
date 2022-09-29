@@ -1,12 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import cryptoService from "../service/cryptoService";
 
 const LoanPage = () => {
+  const navigate = useNavigate();
   const initialFormData = Object.freeze({
-    crypto: "",
-    cryptoAmt: "",
+    cryptoName: "",
+    cryptoCollateralAmt: "",
     eligibleAmt: "",
-    reqLoanAmt: "",
+    requiredLoanAmt: "",
   });
   const [formData, updateFormData] = React.useState(initialFormData);
   const [loan, setLoan] = useState([]);
@@ -24,7 +27,7 @@ const LoanPage = () => {
   const handleUpdate = (e) => {
     updateFormData({
       ...formData,
-      eligibleAmt: 0.7 * formData.cryptoAmt * loan[0].current_price,
+      eligibleAmt: 0.7 * formData.cryptoCollateralAmt * loan[0].current_price,
       // Trimming any whitespace
       [e.target.name]: e.target.value.trim(),
     });
@@ -32,7 +35,7 @@ const LoanPage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/api/v1/loan/" + formData.crypto)
+      .get("http://localhost:8081/api/v1/loan/" + formData.cryptoName)
       .then((res) => {
         setLoan(res.data);
         setLoading(false);
@@ -45,6 +48,18 @@ const LoanPage = () => {
     e.preventDefault();
     console.log(formData);
     // ... submit to API or something
+    const putData = (({
+      cryptoName,
+      requiredLoanAmt,
+      cryptoCollateralAmt,
+    }) => ({ cryptoName, requiredLoanAmt, cryptoCollateralAmt }))(formData);
+
+    console.log(putData);
+    cryptoService.getLoan(putData).catch((error) => {
+      console.log(error);
+    });
+    alert("Loan has been issued!")
+    navigate("/dashboard")
   };
 
   if (!loading) {
@@ -62,8 +77,8 @@ const LoanPage = () => {
                     Choose a crypto :
                   </label>
                   <select
-                    name="crypto"
-                    id="crypto"
+                    name="cryptoName"
+                    id="cryptoName"
                     className="ml-2"
                     onChange={handleChange}
                   >
@@ -96,9 +111,9 @@ const LoanPage = () => {
 
                 <div className="mb-4 px-3 py-1 bg-white rounded-sm border border-gray-300 focus-within:text-gray-900 focus-within:border-gray-500 mt-4">
                   <input
-                    id="cryptoAmt"
+                    id="cryptoCollateralAmt"
                     type="number"
-                    name="cryptoAmt"
+                    name="cryptoCollateralAmt"
                     className="w-full h-8 focus:outline-none mt-4 text-black font-semibold font-sans"
                     placeholder="0.1 - 10"
                     min="0.1"
@@ -129,8 +144,8 @@ const LoanPage = () => {
                       Enter the Required Loan Ammount
                     </label>
                     <input
-                      id="reqLoanAmt"
-                      name="reqLoanAmt"
+                      id="requiredLoanAmt"
+                      name="requiredLoanAmt"
                       type="text"
                       className="w-full h-8 focus:outline-none text-black font-semibold font-sans"
                       placeholder="Maximun - Eligibile Ammount"
